@@ -36,9 +36,11 @@ bike_rides$ended_at <- lubridate::ymd_hms(bike_rides$ended_at)
 bike_rides$start_station_id <- as.integer(bike_rides$start_station_id)
 bike_rides$end_station_id <- as.integer(bike_rides$end_station_id)
 ````
-### Remove NA
+### Conveert blank string to NA and remove all
 ````{r}
-bike_rides <- drop_na(bike_rides)
+bike_rides <- mutate(bike_rides, across(
+where(is.character),~ if_else(.x=="", NA_character_, .x)))
+bike_rides <- na.omit(bike_rides)
 ````
 ### Check for discrepancies
 ````{r}
@@ -85,7 +87,7 @@ bike_rides$day_of_week <- weekdays(bike_rides$date)
 bike_rides$start_hr <- lubridate::hour(bike_rides$started_at)
 ````
 
-### Order days of the week and order months
+### Order weekdays and months
 ````{r}
 bike_rides$day_of_week <- ordered(bike_rides$day_of_week, levels = c("Sunday", "Monday",
                                                                      
@@ -128,8 +130,9 @@ viz_1 <- group_by(bike_rides, member_casual, day_of_week) %>% summarise(num_of_r
 ### viz. Weekdays by number of rides
 ````{r}
 ggplot(viz_1, aes(x=day_of_week, y=num_of_rides, fill=member_casual))+
-  geom_bar(stat='identity', position = "dodge")+ labs(title = "Number of Rides by Day",
-  x="Weekdays", y="Number of Rides")+ theme(axis.text.x = element_text(angle = 45))
+  geom_bar(stat='identity', position = "dodge")+ 
+  labs(title = "Number of Rides by Day", subtitle = "April 2020 - March 2021" ,x="Weekdays", y="Number of Rides")+ 
+  theme(axis.text.x = element_text(angle = 45),legend.title = element_blank())
 ````
 
 ### viz. Month
@@ -137,9 +140,10 @@ ggplot(viz_1, aes(x=day_of_week, y=num_of_rides, fill=member_casual))+
 viz_2 <- group_by(bike_rides, member_casual, month) %>% summarise(num_of_rides=n())
 
 ggplot(viz_2,aes(x=month,y=num_of_rides, fill=member_casual))+
-  geom_bar(stat = 'identity', position = 'dodge')+ labs(title = 'Number of Rides by Month',
-              x= 'Month', y='Number of Rides')+theme(axis.text.x = element_text(angle = 45, vjust = 0.6),
-                                                     legend.title = element_blank())
+  geom_bar(stat = 'identity', position = 'dodge')+ 
+  labs(title = 'Number of Rides by Month', subtitle = "April 2020 - March 2021",x= 'Month', y='Number of Rides')+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.6),
+  legend.title = element_blank())
 ````                                   
 
 ### Scatterplot. AVG ride length
@@ -151,9 +155,11 @@ scatterplot <- bike_rides %>%
   summarise(avg_ride_length = mean(ride_length)) 
 scatterplot %>%
   ggplot(aes(x = day_of_week, y = avg_ride_length, color = member_casual))+
-  geom_point()+
-  facet_wrap(~month)+theme(axis.text.x = 
-element_text(angle = 45,vjust = 0.8), legend.title =        element_blank())+labs(title = "Average Ride Length for Each Month",  y="Ride Length",x="Weekdays")
+  geom_point()+ facet_wrap(~month)+
+  theme(axis.text.x = element_text(angle = 45,vjust = 0.8),
+  legend.title = element_blank())+
+  labs(title = "Average Ride Length for Each Month", 
+  subtitle = "April 2020 - March 2021",y="Ride Length", x="Weekdays")
 ```` 
 
 ### Popular start stations
