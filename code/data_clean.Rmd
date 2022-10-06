@@ -1,6 +1,6 @@
 ---
 title: "Project Bike"
-author: "Zakhar Mamedov"
+author: "Name Surname"
 date: "2022-09-09"
 output:
   pdf_document: default
@@ -17,7 +17,7 @@ library(lubridate)
 ````
 ### Upload and merge columns at once
 ````{r}
-temp <- list.files ("C:/Users/imame/Desktop/Data Analyst/Case Study 1", full.names = TRUE, pattern = "\\.csv$")
+temp <- list.files ("C:/Users/Desktop/...", full.names = TRUE, pattern = "\\.csv$")
 bike_rides <- rbindlist(lapply(temp, fread), fill = TRUE)
 ````
 ### Remove empty
